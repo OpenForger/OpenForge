@@ -1,25 +1,17 @@
-node_modules
-.vscode
+# Git root is web/ — monorepo layout: app/ (SvelteKit), docs/, deploy/, .cursor/
+# See docs/deployment/repo-layout.md
 
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
-package-lock.json
+deploy/compose/.env
 
-# OS
+app/node_modules/
+app/.svelte-kit/
+app/build/
+app/.output/
+app/.vercel/
+app/.env
+app/.env.*
+!app/.env.example
+!app/.env.test
+
 .DS_Store
 Thumbs.db
-
-# Env
-.env
-.env.*
-!.env.example
-!.env.test
-
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
