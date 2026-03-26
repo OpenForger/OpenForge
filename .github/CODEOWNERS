@@ -1,0 +1,10 @@
+# OpenForge — default code owners (GitHub uses this for review requests and branch rules).
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Bootstrap (WP-1.0 §2): founding Tool repo self-nomination (M-MN-01) is satisfied by listing
+# merge-capable maintainers here. Add co-maintainers on the same line.
+#
+# Dogfooding note: Sprint 8 (M-MN-03) will add platform-driven PRs to update this file; until then
+# edit via normal Git workflow. See docs/workplan/openforge-codeowners-bootstrap.md
+
+* @AbdulHannanKhan

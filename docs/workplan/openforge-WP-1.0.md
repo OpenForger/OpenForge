@@ -1,7 +1,7 @@
 # OpenForge — Workplan v1.0 (Dogfooding)
 
 | **Document ID** | WP-1.0 |
-| **Version** | 1.1 |
+| **Version** | 1.4 |
 | **Status** | Draft |
 | **Date** | March 2026 |
 | **Source of truth** | [APD-1.0](../architecture/openforge_APD-1.0.md) (MoSCoW + dogfooding workflow) |
@@ -27,8 +27,8 @@ This document turns the APD into an **execution-oriented workplan**: phases, gat
 | **UI foundation** (theming + shell + shadcn primitives) | Founding | `app/src/app.css` matches [theming](../ui-ux/theming.md); nav shell matches [ui-patterns §1](../ui-ux/ui-patterns.md); demo components on home |
 | GitHub **OAuth App** (staging + prod callbacks) | Founding | Client ID/secret in secret store; scopes documented ([LLD security](../ldd/security/authentication-and-webhooks.md)); [setup guide](../deployment/github-oauth-app.md) |
 | Deployment **target** (containers, Postgres, Redis) | Founding | Staging namespace/cluster or VM compose runs empty stack |
-| **One GitHub issue per Must-Have feature group** (Auth, Requests, Claim/PR, Webhook, Reviews, Profile, Maintainer, CI display, Moderation) | Founding | Issues exist in platform repo; copy ready to paste into first platform requests in Phase 1 |
-| **CODEOWNERS** + self-nomination path understood for Tool repo | Founding | Matches [M-MN-01] — OpenForge repo is the dogfooding Tool |
+| **One GitHub issue per Must-Have feature group** (Auth, Requests, Claim/PR, Webhook, Reviews, Profile, Maintainer, CI display, Moderation) | Founding | **OpenForge:** Auth satisfied in `app/` without an issue; [issues #1–#8](https://github.com/OpenForger/OpenForge/issues) cover the other groups — mapping in [github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md); reuse in Phase 1 platform requests |
+| **CODEOWNERS** + self-nomination path understood for Tool repo | Founding | [`.github/CODEOWNERS`](../../.github/CODEOWNERS) on default branch + team reads [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md) (M-MN-01 bootstrap, M-MN-02 volunteer story, M-MN-03 = Sprint 8) |
 
 ### 2.1 Status (rolling)
 
@@ -36,9 +36,10 @@ This document turns the APD into an **execution-oriented workplan**: phases, gat
 |------|--------|
 | Org + platform repo + initial SvelteKit commit | Done (confirm branch protection locally) |
 | UI foundation | Done — see `app/` (SvelteKit under Git root `web/`) |
-| **Next:** GitHub OAuth App | Register callback `http://localhost:5173/auth/github/callback`. In `app/.env.secret`: client id, secret, and **`AUTH_SECRET`** (`openssl rand -hex 32`). Routes: `/auth/github`, `/auth/github/callback`, `POST /auth/logout`. |
+| GitHub OAuth App | Done — callback + session in `app/`; secrets in `app/.env.secret` ([github-oauth-app.md](../deployment/github-oauth-app.md)) |
 | Deployment target | **In progress** — `deploy/compose/` + [staging-stack.md](../deployment/staging-stack.md); complete when Compose runs and §B checks pass |
-| GitHub issues (one per Must group) + CODEOWNERS | Pending |
+| GitHub issues (Must groups) | Epics **tracked** — [OpenForge](https://github.com/OpenForger/OpenForge/issues) issues **#1–#8** per [github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md) |
+| CODEOWNERS + nomination path | **Next:** merge [`.github/CODEOWNERS`](../../.github/CODEOWNERS) to `OpenForger/OpenForge` default branch; confirm team understands [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md) |
 
 ---
 
@@ -190,6 +191,9 @@ From [APD §3.5](../architecture/openforge_APD-1.0.md):
 |---------|---------|
 | 1.0 | Initial workplan from APD-1.0. |
 | 1.1 | Preconditions: UI foundation row, OAuth guide link, rolling status. |
+| 1.2 | Must-Have GitHub issues: companion doc with 9 copy-paste issue bodies ([github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md)). |
+| 1.3 | OpenForge: Auth without GH issue; platform issues #1–#8 mapped in companion doc; §2.1 status updated. |
+| 1.4 | CODEOWNERS bootstrap: `.github/CODEOWNERS` + [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md); WP §2 row + §2.1 split. |
 
 ---
 

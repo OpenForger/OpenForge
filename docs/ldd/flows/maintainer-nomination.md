@@ -33,6 +33,12 @@
 
 ---
 
+## Bootstrap (founding Tool repo)
+
+Until the nomination UI and M-MN-03 API exist, the **OpenForge** platform repo can satisfy **M-MN-01** by maintaining **`.github/CODEOWNERS`** and documenting the volunteer interim for **M-MN-02**. See [openforge-codeowners-bootstrap.md](../../workplan/openforge-codeowners-bootstrap.md).
+
+---
+
 ## Revision history
 
 | Version | Changes |
