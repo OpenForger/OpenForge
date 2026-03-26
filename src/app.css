@@ -1,0 +1,129 @@
+/*
+ * OpenForge web — token-based styling (no Tailwind).
+ * Prefer editing :root variables and named classes (.btn-primary) over long utility strings.
+ */
+:root {
+	--font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-mono: ui-monospace, 'Cascadia Code', monospace;
+
+	--color-bg: #f4f4f5;
+	--color-surface: #ffffff;
+	--color-text: #18181b;
+	--color-muted: #71717a;
+	--color-border: #e4e4e7;
+	--color-accent: #2563eb;
+	--color-accent-hover: #1d4ed8;
+	--color-on-accent: #ffffff;
+
+	--radius: 0.5rem;
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 1rem;
+	--space-4: 1.5rem;
+	--shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: #09090b;
+		--color-surface: #18181b;
+		--color-text: #fafafa;
+		--color-muted: #a1a1aa;
+		--color-border: #27272a;
+		--color-accent: #3b82f6;
+		--color-accent-hover: #60a5fa;
+		--shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	font-family: var(--font-sans);
+	background: var(--color-bg);
+	color: var(--color-text);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	color: var(--color-accent);
+}
+
+a:hover {
+	color: var(--color-accent-hover);
+}
+
+/* Page shell */
+.layout-shell {
+	min-height: 100vh;
+	padding: var(--space-4);
+	max-width: 48rem;
+	margin: 0 auto;
+}
+
+/* Simple layout primitives */
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.cluster {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	align-items: center;
+}
+
+.surface {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	padding: var(--space-4);
+}
+
+.muted {
+	color: var(--color-muted);
+	font-size: 0.9375rem;
+}
+
+/* Buttons — bits-ui Button.Root merges `class` onto the element */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	padding: var(--space-2) var(--space-3);
+	border-radius: var(--radius);
+	border: 1px solid var(--color-border);
+	font: inherit;
+	line-height: 1.25;
+	cursor: pointer;
+	text-decoration: none;
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.btn-primary {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+	color: var(--color-on-accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+	background: var(--color-accent-hover);
+	border-color: var(--color-accent-hover);
+}
