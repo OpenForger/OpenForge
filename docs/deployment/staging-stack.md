@@ -2,7 +2,7 @@
 
 This guide matches workplan precondition **“Deployment target (containers, Postgres, Redis)”** ([WP-1.0 §2](../workplan/openforge-WP-1.0.md)): a **repeatable** way to run backing services the platform will need, before the app fully uses them.
 
-**Git root** for this project is **`web/`** (see [repo-layout.md](./repo-layout.md)). Companion files:
+**Git root** for this project is the directory that contains **`app/`**, **`docs/`**, and **`deploy/`** (named `web/` in a typical clone). Companion files:
 
 - `deploy/compose/docker-compose.yml` — defines the stack (path from repo root `web/`).
 - `deploy/compose/env.example` — copy to `deploy/compose/.env` for passwords and connection strings.

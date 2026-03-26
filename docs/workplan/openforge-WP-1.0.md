@@ -1,7 +1,7 @@
 # OpenForge — Workplan v1.0 (Dogfooding)
 
 | **Document ID** | WP-1.0 |
-| **Version** | 1.4 |
+| **Version** | 1.5 |
 | **Status** | Draft |
 | **Date** | March 2026 |
 | **Source of truth** | [APD-1.0](../architecture/openforge_APD-1.0.md) (MoSCoW + dogfooding workflow) |
@@ -27,8 +27,8 @@ This document turns the APD into an **execution-oriented workplan**: phases, gat
 | **UI foundation** (theming + shell + shadcn primitives) | Founding | `app/src/app.css` matches [theming](../ui-ux/theming.md); nav shell matches [ui-patterns §1](../ui-ux/ui-patterns.md); demo components on home |
 | GitHub **OAuth App** (staging + prod callbacks) | Founding | Client ID/secret in secret store; scopes documented ([LLD security](../ldd/security/authentication-and-webhooks.md)); [setup guide](../deployment/github-oauth-app.md) |
 | Deployment **target** (containers, Postgres, Redis) | Founding | Staging namespace/cluster or VM compose runs empty stack |
-| **One GitHub issue per Must-Have feature group** (Auth, Requests, Claim/PR, Webhook, Reviews, Profile, Maintainer, CI display, Moderation) | Founding | **OpenForge:** Auth satisfied in `app/` without an issue; [issues #1–#8](https://github.com/OpenForger/OpenForge/issues) cover the other groups — mapping in [github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md); reuse in Phase 1 platform requests |
-| **CODEOWNERS** + self-nomination path understood for Tool repo | Founding | [`.github/CODEOWNERS`](../../.github/CODEOWNERS) on default branch + team reads [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md) (M-MN-01 bootstrap, M-MN-02 volunteer story, M-MN-03 = Sprint 8) |
+| **One GitHub issue per Must-Have feature group** (Auth, Requests, Claim/PR, Webhook, Reviews, Profile, Maintainer, CI display, Moderation) | Founding | **OpenForge:** Auth in `app/` (no tracking issue); other groups tracked as [GitHub issues #1–#8](https://github.com/OpenForger/OpenForge/issues) — see **§2.2**; reuse in Phase 1 platform requests |
+| **CODEOWNERS** + self-nomination path understood for Tool repo | Founding | [`.github/CODEOWNERS`](../../.github/CODEOWNERS) on default branch; team understands [bootstrap for founding repo](../ldd/flows/maintainer-nomination.md#bootstrap-openforge-platform-repo) (M-MN-01–M-MN-03) |
 
 ### 2.1 Status (rolling)
 
@@ -38,8 +38,24 @@ This document turns the APD into an **execution-oriented workplan**: phases, gat
 | UI foundation | Done — see `app/` (SvelteKit under Git root `web/`) |
 | GitHub OAuth App | Done — callback + session in `app/`; secrets in `app/.env.secret` ([github-oauth-app.md](../deployment/github-oauth-app.md)) |
 | Deployment target | **In progress** — `deploy/compose/` + [staging-stack.md](../deployment/staging-stack.md); complete when Compose runs and §B checks pass |
-| GitHub issues (Must groups) | Epics **tracked** — [OpenForge](https://github.com/OpenForger/OpenForge/issues) issues **#1–#8** per [github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md) |
-| CODEOWNERS + nomination path | **Next:** merge [`.github/CODEOWNERS`](../../.github/CODEOWNERS) to `OpenForger/OpenForge` default branch; confirm team understands [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md) |
+| GitHub issues (Must groups) | Done — [OpenForge](https://github.com/OpenForger/OpenForge/issues) **#1–#8** per §2.2 |
+| CODEOWNERS + nomination path | Done — [`.github/CODEOWNERS`](../../.github/CODEOWNERS) + [maintainer nomination bootstrap](../ldd/flows/maintainer-nomination.md#bootstrap-openforge-platform-repo) |
+
+### 2.2 OpenForge platform repo — Must-Have GitHub issues
+
+Canonical repo: **[OpenForger/OpenForge](https://github.com/OpenForger/OpenForge)**. Auth epic has no issue (already implemented in `app/`). Remaining groups map **GitHub issue number = workplan epic order after Auth** (first epic = #1).
+
+| Issue | Must-Have group | Req IDs |
+|-------|-----------------|---------|
+| — | Auth | M-AU-01–M-AU-03 (in `app/`) |
+| [#1](https://github.com/OpenForger/OpenForge/issues/1) | Requests | M-RQ-01–M-RQ-06 |
+| [#2](https://github.com/OpenForger/OpenForge/issues/2) | Claim + PR | M-CL-01–M-CL-03 |
+| [#3](https://github.com/OpenForger/OpenForge/issues/3) | Webhooks | M-WH-01–M-WH-04 |
+| [#4](https://github.com/OpenForger/OpenForge/issues/4) | Reviews | M-RV-01–M-RV-06 |
+| [#5](https://github.com/OpenForger/OpenForge/issues/5) | Profiles | M-PR-01–M-PR-05 |
+| [#6](https://github.com/OpenForger/OpenForge/issues/6) | Maintainer | M-MN-01–M-MN-03 |
+| [#7](https://github.com/OpenForger/OpenForge/issues/7) | CI display | M-CI-01–M-CI-02 |
+| [#8](https://github.com/OpenForger/OpenForge/issues/8) | Moderation | M-MD-01–M-MD-03 |
 
 ---
 
@@ -191,9 +207,10 @@ From [APD §3.5](../architecture/openforge_APD-1.0.md):
 |---------|---------|
 | 1.0 | Initial workplan from APD-1.0. |
 | 1.1 | Preconditions: UI foundation row, OAuth guide link, rolling status. |
-| 1.2 | Must-Have GitHub issues: companion doc with 9 copy-paste issue bodies ([github-issues-phase0-must-have.md](./github-issues-phase0-must-have.md)). |
-| 1.3 | OpenForge: Auth without GH issue; platform issues #1–#8 mapped in companion doc; §2.1 status updated. |
-| 1.4 | CODEOWNERS bootstrap: `.github/CODEOWNERS` + [openforge-codeowners-bootstrap.md](./openforge-codeowners-bootstrap.md); WP §2 row + §2.1 split. |
+| 1.2 | Must-Have GitHub issues: companion doc with paste-ready issue bodies (later folded into §2.2). |
+| 1.3 | OpenForge: Auth without GH issue; platform issues #1–#8; §2.1 status updated. |
+| 1.4 | CODEOWNERS: `.github/CODEOWNERS` + bootstrap in maintainer LLD; §2.1 split. |
+| 1.5 | §2.2 issue table; CODEOWNERS row done; removed task-only workplan MDs; Cursor rule frontmatter fixed. |
 
 ---
 

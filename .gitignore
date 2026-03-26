@@ -1,5 +1,7 @@
-# Git root is web/ — monorepo layout: app/ (SvelteKit), docs/, deploy/, .cursor/
-# See docs/deployment/repo-layout.md
+# Git root is web/ — monorepo layout: app/ (SvelteKit), docs/, deploy/
+
+# Cursor IDE — local only; do not commit (team members maintain their own copies)
+.cursor/
 
 deploy/compose/.env
 

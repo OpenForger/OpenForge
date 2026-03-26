@@ -33,9 +33,17 @@
 
 ---
 
-## Bootstrap (founding Tool repo)
+## Bootstrap: OpenForge platform repo
 
-Until the nomination UI and M-MN-03 API exist, the **OpenForge** platform repo can satisfy **M-MN-01** by maintaining **`.github/CODEOWNERS`** and documenting the volunteer interim for **M-MN-02**. See [openforge-codeowners-bootstrap.md](../../workplan/openforge-codeowners-bootstrap.md).
+Until the nomination UI and M-MN-03 API exist, use GitHub + manual PRs as a stand-in. Canonical repo: **[OpenForger/OpenForge](https://github.com/OpenForger/OpenForge)**.
+
+**M-MN-01 (self-nom):** Founding admins list their `@handles` in **`.github/CODEOWNERS`** (repo root) on the default branch. Add co-maintainers on the same `*` line, space-separated.
+
+**M-MN-02 (volunteer):** If the Requester cannot self-nominate, agree who volunteers and **merge a PR** updating `.github/CODEOWNERS`. Requests must not stay stuck at **Claimed** without maintainer resolution ([FR-MN-02] in `docs/requirements/openforge_FR-1.1.tex`). Full product flow: GitHub epic for Maintainer (e.g. [OpenForge #6](https://github.com/OpenForger/OpenForge/issues/6)).
+
+**M-MN-03:** Sprint 8 adds API-driven CODEOWNERS PRs ([NFR-SE-05], § CODEOWNERS generation above). Until then, manual PRs only.
+
+**Branch protection:** Consider requiring PRs to default branch; add “require review from Code Owners” when the team grows. See GitHub [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
 
 ---
 
@@ -44,3 +52,4 @@ Until the nomination UI and M-MN-03 API exist, the **OpenForge** platform repo c
 | Version | Changes |
 |---------|---------|
 | 1.0 | Initial flow. |
+| 1.1 | Bootstrap section expanded (OpenForge CODEOWNERS interim); workplan points here. |

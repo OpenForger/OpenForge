@@ -15,6 +15,6 @@ Product-facing experience documentation for the web platform. It extends the nor
 - [FR-1.1](../requirements/openforge_FR-1.1.tex) — functional behaviour and labels.
 - [NFR-1.1](../requirements/openforge_NFR-1.1.tex) — usability, performance, security UX constraints.
 - [APD-1.0](../architecture/openforge_APD-1.0.md) — delivery priorities and dogfooding context.
-- Web implementation (reference): `app/src/app.css` (shadcn + OpenForge tokens); `app/src/lib/components/ui/*` (shadcn-svelte registry); `app/src/lib/components/shell/*` (app chrome). Git root is `web/` — see [repo-layout](../deployment/repo-layout.md).
+- Web implementation (reference): `app/src/app.css` (shadcn + OpenForge tokens); `app/src/lib/components/ui/*` (shadcn-svelte registry); `app/src/lib/components/shell/*` (app chrome). **Git root** is the clone root that contains `app/` and `docs/` (this repo’s default layout).
 
 When FR/NFR and this folder disagree, **FR/NFR win**; update these docs after requirement changes.
