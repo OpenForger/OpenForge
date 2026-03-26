@@ -1,0 +1,579 @@
+\documentclass[12pt,a4paper]{article}
+\newcommand{\doctype}{--- Functional Requirements}
+\newcommand{\docdate}{March 2026}
+\usepackage{openforge_style}
+\begin{document}
+
+%% COVER PAGE
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{3cm}
+  {\fontsize{42}{50}\selectfont\bfseries\color{ofblue} OPENFORGE}\\[0.6em]
+  {\Large\color{ofaccent} Software Requirements Specification}\\[0.3em]
+  {\large\color{ofaccent} Functional Requirements --- FR-1.1}\\[1.5em]
+  \color{ofrule}\rule{0.6\textwidth}{1.2pt}\\[1.5em]
+  {\normalsize\itshape\color{ofgray}
+    A Community-Driven Open Source Contribution Platform\\[0.3em]
+    Bridging New Coders, Experienced Contributors, and Real-World OSS Needs
+  }\\[3cm]
+  \begin{tabular}{L{3.5cm} L{8cm}}
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Document ID}   & FR-1.1 \\
+    \textbf{\color{ofblue}Version}       & 1.1 --- Revised \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Status}        & Draft \\
+    \textbf{\color{ofblue}Date}          & March 2026 \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Audience}      & Platform Architects, Engineers, Community Leads \\
+    \textbf{\color{ofblue}Companion doc} & NFR-1.1 (Non-Functional Requirements) \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}License model} & Contributor-selected OSI-approved license \\
+  \end{tabular}
+\end{center}
+\newpage
+
+\tableofcontents
+\newpage
+
+%% 1. INTRODUCTION
+\section{Introduction}
+
+\subsection{Purpose}
+This document specifies the functional requirements for OpenForge --- a community-driven platform that connects people who need open source tools with contributors willing to build them. OpenForge operates as a lightweight prioritisation and reputation layer on top of GitHub infrastructure rather than replacing it. The platform deliberately maximises its use of GitHub's existing mechanisms (Issues, Actions, CODEOWNERS, Releases, OAuth) and confines its own surface to what GitHub does not provide: demand voting, the review annotation layer, and domain-tagged contributor profiles.
+
+The platform is designed so that \textbf{new coders are first-class participants}: contributing real solutions to real problems from their earliest days, learning through peer review, and building a credible public profile that reflects genuine impact rather than artificial exercises.
+
+\subsection{Background and Motivation}
+The proliferation of AI-assisted coding tools has dramatically lowered the barrier to writing functional code. Students and early-career developers now have access to free tiers of powerful tools but lack meaningful problems to direct that capability toward. Meanwhile, the open source ecosystem --- particularly Linux tooling --- suffers from a persistent gap: powerful command-line tools with poor or nonexistent graphical interfaces, bugs that languish for lack of reviewers, and feature requests that never surface above the noise.
+
+OpenForge addresses both problems simultaneously. The public surfaces what it actually needs. Contributors --- new and experienced alike --- have a clear, demand-validated queue of real work to choose from. Every contribution builds a transparent, domain-tagged record that speaks for itself.
+
+\subsection{Scope}
+This document covers:
+\begin{itemize}
+  \item Platform actors and their roles
+  \item The request lifecycle from idea to shipped tool
+  \item The maintainer nomination model for new and existing repositories
+  \item The multi-stage quality and review system
+  \item The contributor and reviewer profile and reputation model
+  \item GitHub integration and coexistence strategy
+  \item Tag and domain footprinting system
+\end{itemize}
+
+\noindent\textbf{Out of scope for v1.0:} native code hosting, mobile applications, payment processing, and monetary funding mechanics. CI/CD infrastructure is consumed via GitHub Actions and not hosted by OpenForge. Stale repository tracking applies only to Tool-type requests with platform-created repositories; all other request types are exempt.
+
+\subsection{Definitions}
+\begin{longtable}{L{3.2cm} L{10.5cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Term & \color{white}\bfseries Definition \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Term & \color{white}\bfseries Definition \\
+  \endhead\hline
+  Request          & A publicly submitted need for a tool, feature, bug fix, or improvement, posted by any logged-in user. \\
+  \rowcolor{ofrowalt}
+  Contributor      & Any user who submits code toward fulfilling a request via a linked GitHub pull request. \\
+  Reviewer         & Any logged-in user who leaves at least one review comment on a platform-linked PR. The Reviewer tag is awarded on the first comment. \\
+  \rowcolor{ofrowalt}
+  New Coder        & A contributor or reviewer with limited prior contribution history; treated as a \emph{primary} platform beneficiary, not a second-class actor. \\
+  Tag              & A domain or technology label applied to requests and PRs, used for filtering, discovery, and profile footprinting. \\
+  \rowcolor{ofrowalt}
+  Annotation       & A response to an existing review comment --- either an agreement, an extension, or a flag --- left by any logged-in user. \\
+  Nominated Maintainer & A GitHub user identified at request submission time as the merge authority for the linked repository. May be the Requester, a suggested user, or a Contributor volunteer. \\
+  \rowcolor{ofrowalt}
+  Upstream Maintainer & The existing maintainer(s) of a pre-existing GitHub repository, as defined by the repository's CODEOWNERS file or admin list. \\
+  Solved signal    & A requester's explicit confirmation that a shipped tool satisfactorily addresses their original need. \\
+  \rowcolor{ofrowalt}
+  Domain footprint & The aggregated tag-based record of what areas a contributor or reviewer has worked in, derived from merged PRs and accepted reviews. \\
+  \hline
+\end{longtable}
+
+%% 2. PLATFORM ACTORS
+\section{Platform Actors}
+
+\begin{successbox}
+\textbf{First-class actor principle:} New coders are intentional first-class actors on this platform. The system is designed so that someone making their first ever review or first ever pull request is not disadvantaged, gated, or hidden from view. Their activity is visible, annotatable, and credited from day one.
+\end{successbox}
+
+\subsection{Actor Overview}
+OpenForge recognises five primary actor types. All actors interact via the web interface; code activity is executed on GitHub and linked back to the platform.
+
+\begin{longtable}{L{2.8cm} L{7.5cm} L{3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Actor & \color{white}\bfseries Description & \color{white}\bfseries Prerequisite \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Actor & \color{white}\bfseries Description & \color{white}\bfseries Prerequisite \\
+  \endhead\hline
+  Public User  & Any person who visits the platform. Can browse requests, vote counts, review threads, and contributor profiles. & None \\
+  \rowcolor{ofrowalt}
+  Requester    & A logged-in user who submits a request and nominates or suggests a maintainer for the linked repository. & Logged-in account \\
+  Contributor  & A logged-in user who claims a request, submits a GitHub PR, and may volunteer as Nominated Maintainer. Includes new coders. & GitHub account linked \\
+  \rowcolor{ofrowalt}
+  Reviewer     & Any logged-in user who leaves at least one review comment on a platform-linked PR. Reviewer tag awarded immediately on first review. No GitHub account required for platform-native reviews. & Logged-in account \\
+  Maintainer   & The merge authority for a linked repository. For new repositories: nominated at request creation or volunteered by a Contributor. For existing repositories: the upstream GitHub maintainer, optionally tagged by the Requester. & Repository admin rights on GitHub \\
+  \hline
+\end{longtable}
+
+\subsection{The New Coder as Primary Actor}
+New coders represent the platform's highest-priority growth constituency:
+\begin{itemize}
+  \item \texttt{[FR-AC-01]} The Reviewer tag is awarded on the first review comment with no minimum threshold, seniority requirement, or approval from another user.
+  \item \texttt{[FR-AC-02]} Review comments by new coders are displayed in the same thread as those by experienced contributors; there is no separate or subordinate view.
+  \item \texttt{[FR-AC-03]} Any reviewer may annotate any other reviewer's comment regardless of relative experience levels.
+  \item \texttt{[FR-AC-04]} The platform's discovery surface shall include a \emph{good first review} and \emph{good first contribution} filter surfacing approachable, well-scoped requests.
+  \item \texttt{[FR-AC-05]} New coders are explicitly encouraged to review before they contribute --- reviewing is the fastest route to learning a codebase and building domain knowledge.
+\end{itemize}
+
+\begin{infobox}
+\textbf{Design principle:} The platform shall never present a new coder with a wall that says ``earn X points before you can do Y.'' Every door is open from the first login. What differentiates users over time is the depth and quality of their public record, not gated permissions.
+\end{infobox}
+
+\subsection{Actor Interaction Flow}
+\begin{enumerate}
+  \item \texttt{[FR-AI-01]} A Requester submits a request with title, description, motivation, tags, a linked GitHub repository, and a linked GitHub issue. The Requester also nominates a Maintainer at this point (see Section~\ref{sec:maintainer}).
+  \item \texttt{[FR-AI-02]} Public users upvote and comment on requests, surfacing community priority.
+  \item \texttt{[FR-AI-03]} A Contributor claims the request, is assigned to it on the platform, and opens a PR on GitHub linking it to the platform request ID.
+  \item \texttt{[FR-AI-04]} Reviewers, including new coders, leave review comments on the linked PR. Any reviewer may extend, agree with, or flag any other reviewer's comment.
+  \item \texttt{[FR-AI-05]} The Contributor revises the submission based on review feedback.
+  \item \texttt{[FR-AI-06]} The Nominated or Upstream Maintainer merges the PR on GitHub. The platform detects the merge via webhook, credits the contributor, and notifies the Requester.
+  \item \texttt{[FR-AI-07]} The Requester marks the request as Solved if their need is met.
+  \item \texttt{[FR-AI-08]} Post-ship signals accumulate over time: install counts, forks, external references.
+\end{enumerate}
+
+%% 3. MAINTAINER NOMINATION
+\section{Maintainer Nomination Model}
+\label{sec:maintainer}
+
+\subsection{Why Maintainership Must Be Resolved at Submission}
+A pull request on GitHub requires a user with repository write access to merge it. For requests targeting existing repositories this user already exists. For requests that create a new repository specifically to fulfil the request, no such user exists yet --- the platform must provide a mechanism to resolve this before a Contributor's work can be merged.
+
+The platform resolves this at request submission time, not after the fact, to avoid a situation where code is written but cannot be merged.
+
+\subsection{New Repository Requests (Tool type)}
+\texttt{[FR-MN-01]} When a Requester creates a request of type Tool and creates a new GitHub repository for it, they shall complete a maintainer nomination step before the request is published:
+
+\begin{longtable}{L{3.5cm} L{9.8cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Option & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Option & \color{white}\bfseries Description \\
+  \endhead\hline
+  Self-nominate    & The Requester nominates themselves as Maintainer. Requires the Requester to have a GitHub account and be the repository admin. Appropriate when the Requester has the technical capacity to review and merge PRs. \\
+  \rowcolor{ofrowalt}
+  Suggest a user   & The Requester suggests a GitHub username as Maintainer. The suggested user receives a platform notification and must explicitly accept. The request remains Open while acceptance is pending; the Requester is shown the pending status. \\
+  Open for volunteer & The Requester leaves the Maintainer role open. When a Contributor claims the request, they are offered the option to also volunteer as Maintainer. The first Contributor to volunteer and be confirmed becomes the Maintainer. The repository's CODEOWNERS file is updated accordingly via a platform-generated PR. \\
+  \hline
+\end{longtable}
+
+\texttt{[FR-MN-02]} A request of type Tool with no Maintainer assigned shall not progress past the Claimed state. The platform shall surface a clear prompt to the Requester to resolve maintainer assignment before Contributors are asked to invest time in the work.
+
+\texttt{[FR-MN-03]} When a Contributor volunteers as Maintainer, the platform shall generate a CODEOWNERS file (or update an existing one) in the linked repository, naming the volunteer. This uses standard GitHub infrastructure to enforce merge authority without any platform-side gating.
+
+\subsection{Existing Repository Requests (Feature, Bug Fix, UI/UX, Documentation)}
+\texttt{[FR-MN-04]} For requests targeting an existing GitHub repository, the upstream maintainer(s) are already defined by the repository's existing admin list and CODEOWNERS file. The platform does not need to resolve or assign merge authority.
+
+\texttt{[FR-MN-05]} The Requester may optionally tag the GitHub username of the upstream maintainer in the request. This causes the platform to send a one-time notification to that user informing them of the request and its vote count. The upstream maintainer is under no obligation to respond.
+
+\texttt{[FR-MN-06]} If the upstream maintainer is not tagged, the request proceeds normally. When a Contributor's PR is eventually merged by the upstream maintainer through their normal GitHub workflow, the platform detects the merge via webhook and updates state as usual.
+
+\texttt{[FR-MN-07]} Stale tracking (Section~\ref{sec:stale}) does not apply to requests of type Feature, Bug Fix, UI/UX Improvement, or Documentation. The health of an existing repository is governed by its upstream community, not the platform.
+
+%% 4. REQUEST LIFECYCLE
+\section{Request Lifecycle}
+
+\subsection{Request Submission}
+\texttt{[FR-RL-01]} Any logged-in user may submit a request with the following fields:
+
+\begin{longtable}{L{3cm} L{2cm} L{8.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Field & \color{white}\bfseries Required & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Field & \color{white}\bfseries Required & \color{white}\bfseries Description \\
+  \endhead\hline
+  Title             & Yes      & Short, descriptive name of the tool, feature, or bug. \\
+  \rowcolor{ofrowalt}
+  Description       & Yes      & Detailed explanation of the need, use case, and expected behaviour. Markdown supported. \\
+  Category          & Yes      & One of: Tool, Feature, Bug Fix, UI/UX Improvement, Documentation. \\
+  \rowcolor{ofrowalt}
+  Tags              & Yes      & One or more domain/technology tags. At least one required; maximum eight. \\
+  Linked repository & Yes      & GitHub repository URL. For Tool requests, the Requester creates the repository before submission. \\
+  \rowcolor{ofrowalt}
+  Linked issue      & Yes      & GitHub issue URL within the linked repository. Requester creates the issue if one does not exist. \\
+  Maintainer nomination & Conditional & Required for Tool requests with new repositories. See Section~\ref{sec:maintainer}. Optional for all other categories. \\
+  \rowcolor{ofrowalt}
+  Motivation        & Optional & Who is affected, how often, and why this matters. Strongly encouraged. \\
+  Attachments       & Optional & Screenshots, mockups, or reference links. \\
+  \hline
+\end{longtable}
+
+\subsection{Request States}
+\texttt{[FR-RL-02]} A request moves through the following states. States are mutually exclusive.
+
+\begin{longtable}{L{3cm} L{5.3cm} L{5cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries State & \color{white}\bfseries Meaning & \color{white}\bfseries Trigger \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries State & \color{white}\bfseries Meaning & \color{white}\bfseries Trigger \\
+  \endhead\hline
+  Open           & Live and accepting upvotes, comments, and contributor claims. & Initial state on submission. \\
+  \rowcolor{ofrowalt}
+  Claimed        & At least one contributor has been assigned to the request. & Contributor claim accepted. \\
+  In Development & At least one contributor has linked a PR. & Contributor links a PR. \\
+  \rowcolor{ofrowalt}
+  In Review      & The linked PR has received at least one review comment. & First review comment posted. \\
+  Merged         & The linked PR has been merged on GitHub. & GitHub merge event detected via webhook. \\
+  \rowcolor{ofrowalt}
+  Solved         & Requester confirms the tool satisfies their need. & Requester marks solved. \\
+  Stale          & No commit activity on a Tool-type repository for 180 days post-merge. Tool requests only. & Automated check. \\
+  \rowcolor{ofrowalt}
+  Maintained     & A Maintainer has claimed active stewardship of a stale Tool repository. Tool requests only. & Maintainer claim accepted. \\
+  Closed         & Request withdrawn by requester or rejected as out of scope. & Manual action. \\
+  \hline
+\end{longtable}
+
+\begin{infobox}
+The Stale and Maintained states apply exclusively to Tool-type requests where a new repository was created for the platform request. Feature, Bug Fix, UI/UX Improvement, and Documentation requests never enter these states --- their lifecycle ends at Solved or Closed.
+\end{infobox}
+
+\subsection{Voting and Prioritisation}
+\texttt{[FR-RL-03]} Requests are ranked using a composite signal designed to resist gaming:
+\begin{itemize}
+  \item Upvote count from distinct accounts (primary signal)
+  \item Number of distinct users who have commented or engaged with the request
+  \item Recency of last activity
+  \item Ratio of requesters who described a concrete use case vs.\ vague interest
+\end{itemize}
+
+\texttt{[FR-RL-04]} Downvotes are not surfaced publicly. Users may flag a request as duplicate, out of scope, or already solved. A threshold of flags (default: 5 distinct users) triggers a moderation queue entry.
+
+\subsection{Tags and Domain Classification}
+\texttt{[FR-RL-05]} Tags applied to a request are inherited by any linked PR and subsequently by contributor and reviewer profiles.
+\begin{itemize}
+  \item \texttt{[FR-RL-06]} Tags are predefined and curated to prevent fragmentation.
+  \item \texttt{[FR-RL-07]} Requesters may propose new tags; proposed tags enter a curation queue before becoming searchable.
+  \item \texttt{[FR-RL-08]} A request may carry up to eight tags.
+  \item \texttt{[FR-RL-09]} Tags are hierarchical where relevant (e.g.\ \texttt{gtk} is a child of \texttt{linux-desktop}).
+  \item \texttt{[FR-RL-10]} On PR merge, request tags are added to the contributor's domain footprint under \emph{merged contributions}.
+  \item \texttt{[FR-RL-11]} On PR merge, request tags are added to all reviewers' domain footprints under \emph{review activity}.
+\end{itemize}
+
+%% 5. QUALITY AND REVIEW
+\section{Quality and Review System}
+
+\subsection{Design Philosophy}
+The review system serves two equally important purposes: quality assurance for the platform's output, and skill development for contributors and reviewers. These purposes are complementary. There are no senior or junior reviewer designations. Every user who leaves a review comment receives the Reviewer tag.
+
+\subsection{Stage 1 --- Automated Checks via GitHub Actions}
+\texttt{[FR-QA-01]} Triggered when a PR is linked to a platform request. The platform reads GitHub Actions check statuses via the GitHub API --- it does not run or host any CI infrastructure. A failed check does not block human review but is prominently flagged on the request page.
+
+Checks the platform surfaces from GitHub Actions:
+\begin{itemize}
+  \item Build passes
+  \item Linting passes for declared language(s)
+  \item Test suite passes where tests exist
+  \item No secrets or credentials detected (via a GitHub Actions secret-scanning step)
+  \item PR description references the platform request ID (enforced by a lightweight Actions workflow template provided by the platform)
+\end{itemize}
+
+Additional checks enforced by platform policy (not GitHub Actions):
+\begin{itemize}
+  \item Attribution header present in new files (checked via platform webhook handler)
+  \item No binary blobs committed (checked via platform webhook handler)
+\end{itemize}
+
+\subsection{Stage 2 --- Community Triage}
+\texttt{[FR-QA-02]} Any logged-in user may participate. Triage votes are aggregated as a summary signal; they do not block merge.
+\begin{itemize}
+  \item Flag PR as a duplicate of an existing merged tool
+  \item Flag that the README is absent or incomprehensible
+  \item Flag that the PR does not appear to address the linked request
+  \item Vote that the tool is usable as described
+\end{itemize}
+
+\subsection{Stage 3 --- Open Review}
+\texttt{[FR-QA-03]} Any logged-in user may leave a review comment on any linked PR. There is no approval process, no minimum experience level, and no review quota.
+
+\subsubsection{Review Comment Structure}
+\begin{itemize}
+  \item A primary observation referencing a file and line range where applicable
+  \item An optional severity marker: \textbf{Blocker}, \textbf{Concern}, or \textbf{Suggestion}
+  \item Optional supporting context: references, upstream links, or alternative approaches
+\end{itemize}
+
+\subsubsection{Annotation Mechanics}
+\texttt{[FR-QA-04]} Every review comment may be annotated by any other logged-in user:
+
+\begin{longtable}{L{3.5cm} L{9.8cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Annotation & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Annotation & \color{white}\bfseries Description \\
+  \endhead\hline
+  \textbf{Agree}             & Endorses the observation without adding new content. Increments the agree count. \\
+  \rowcolor{ofrowalt}
+  \textbf{Extend}            & Adds new supporting detail or a relevant reference. Creates a child comment in the thread. Strongly encouraged as the entry action for new coders. \\
+  \textbf{Flag as incorrect} & Challenges the observation. Requires a written explanation. Notifies the original commenter. \\
+  \hline
+\end{longtable}
+
+\texttt{[FR-QA-05]} Annotation counts are visible to all users and contribute to the reviewer's profile statistics.
+
+\begin{successbox}
+New coders are explicitly encouraged to use the \textbf{Extend} mechanic as their first reviewing action. It is a lower-commitment entry point than originating a primary review, and still creates a visible, credited record of engagement.
+\end{successbox}
+
+\subsection{Stage 4 --- Merge}
+\texttt{[FR-QA-06]} Merge occurs on GitHub through normal PR workflow. The merge decision rests with the Nominated Maintainer (for new repositories) or the Upstream Maintainer (for existing repositories). The platform does not control or gate merges. On merge detection the platform shall:
+\begin{itemize}
+  \item Update request state to Merged
+  \item Credit the contributor with a merge event on their profile
+  \item Inherit request tags into the contributor's domain footprint
+  \item Inherit request tags into all reviewers' domain footprints
+  \item Notify the requester and all watchers
+\end{itemize}
+
+\subsection{Stage 5 --- Post-Ship Signals}
+\texttt{[FR-QA-07]} Post-ship signals accumulate over time and are the most authentic measure of real value.
+
+\begin{longtable}{L{3.5cm} L{9.8cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Signal & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Signal & \color{white}\bfseries Description \\
+  \endhead\hline
+  Solved mark       & Requester marks the request solved. Strongest post-ship signal. \\
+  \rowcolor{ofrowalt}
+  Install/download  & Count via package registry APIs where available. Shown in ranges: 10+, 100+, 1K+, 1M+. \\
+  External forks    & Number of GitHub forks of the linked repository. \\
+  \rowcolor{ofrowalt}
+  Upstream adoption & Manual flag: tool adopted or referenced by the upstream project maintainer. \\
+  Dependent projects & Other platform-listed projects declaring a dependency on this tool. \\
+  \hline
+\end{longtable}
+
+\subsection{Stage 6 --- Maintenance Watch (Tool Requests Only)}
+\label{sec:stale}
+\texttt{[FR-QA-08]} This stage applies exclusively to Tool-type requests with a platform-created repository. Six months after merge with no commit activity, the platform sets state to Stale and opens the tool for Maintainer claims.
+\begin{itemize}
+  \item The Nominated Maintainer is notified and given 30 days to confirm continued active maintenance.
+  \item If no response, any user may submit a Maintainer claim with a brief maintenance plan.
+  \item Accepted maintainership is recorded on both the new Maintainer's profile and the original contributor's profile. State transitions to \emph{Maintained}.
+  \item Maintainer contributions carry their own tag inheritance and profile credit, distinct from original contribution credit.
+\end{itemize}
+
+%% 6. PROFILES
+\section{Contributor and Reviewer Profiles}
+
+\subsection{Profile Structure}
+\texttt{[FR-PR-01]} Every registered user has a single unified profile surfacing both contribution and review activity side by side. There is no separate reviewer account.
+
+\subsection{Contributor Profile Data}
+\begin{longtable}{L{4cm} L{1.8cm} L{7.5cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Data point & \color{white}\bfseries Visible & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Data point & \color{white}\bfseries Visible & \color{white}\bfseries Description \\
+  \endhead\hline
+  Tools shipped          & Yes & Count of PRs merged on platform-linked requests. \\
+  \rowcolor{ofrowalt}
+  Requests solved        & Yes & Count of merged contributions where the requester marked the request solved. \\
+  Installs/downloads     & Yes & Aggregate install count across all shipped tools, shown in ranges: 10+, 100+, 1K+, 1M+. \\
+  \rowcolor{ofrowalt}
+  Tools forked by others & Yes & Count of shipped tools forked on GitHub. \\
+  Domain footprint       & Yes & Tag breakdown of merged contributions grouped by tag family. \\
+  \rowcolor{ofrowalt}
+  Active maintainerships & Yes & Tools the user is currently actively maintaining. \\
+  Contribution timeline  & Yes & Week-by-week activity chart. Colour-coded: yellow (PR opened), green (PR merged), sky blue (review), purple (maintainer activity), orange (request submitted). \\
+  \hline
+\end{longtable}
+
+\subsection{Reviewer Profile Data}
+\begin{longtable}{L{4cm} L{1.8cm} L{7.5cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Data point & \color{white}\bfseries Visible & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Data point & \color{white}\bfseries Visible & \color{white}\bfseries Description \\
+  \endhead\hline
+  PRs reviewed              & Yes & Total count of distinct PRs on which the user has left at least one review comment. \\
+  \rowcolor{ofrowalt}
+  Review comments           & Yes & Total count of individual review comments left. \\
+  Reviewing since           & Yes & Date of first review comment. \\
+  \rowcolor{ofrowalt}
+  Comments agreed with      & Yes & Count of this reviewer's comments that received at least one Agree annotation. \\
+  Comments extended         & Yes & Count of this reviewer's comments that received at least one Extend annotation. \\
+  \rowcolor{ofrowalt}
+  Comments flagged incorrect & No & Retained for internal stats and future feature development. \\
+  Reviewer domain footprint & Yes & Tag breakdown of PRs reviewed, showing domains engaged with most. \\
+  \rowcolor{ofrowalt}
+  Contrarian accuracy       & Yes & Count of flags raised by this reviewer that no other reviewer initially agreed with, but which the contributor subsequently addressed. Indicates independent judgment. \\
+  \hline
+\end{longtable}
+
+\begin{infobox}
+Fields marked Visible are always publicly displayed. Non-visible fields are retained for internal statistics and future feature development.
+\end{infobox}
+
+\subsection{Profile Tags}
+\texttt{[FR-PR-02]} Activity tags are awarded automatically and never removed. Each tag displays a count indicating intensity in that role:
+\begin{itemize}
+  \item \textbf{Contributor} --- awarded on first merged PR for a platform request
+  \item \textbf{Reviewer} --- awarded on first review comment left on a platform-linked PR
+  \item \textbf{Maintainer} --- awarded when a maintainer nomination or claim is accepted
+  \item \textbf{Requester} --- awarded on first submitted request (informational only)
+\end{itemize}
+
+\subsection{What Employers See}
+The profile surfaces raw, verifiable activity: duration, consistency, domain specificity, impact, and review judgment quality. The platform does not assign scores or grades.
+
+%% 7. GITHUB INTEGRATION
+\section{GitHub Integration}
+
+\subsection{Coexistence Principle}
+\texttt{[FR-GH-01]} OpenForge maximises its use of existing GitHub infrastructure. The platform's own surface is confined to demand voting, the review annotation layer, and profile aggregation. Every capability that GitHub already provides natively --- issue tracking, CI/CD, code review, notifications, access control --- is delegated to GitHub.
+
+\subsection{GitHub Infrastructure Used Directly}
+\begin{longtable}{L{3.5cm} L{9.8cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries GitHub feature & \color{white}\bfseries How OpenForge uses it \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries GitHub feature & \color{white}\bfseries How OpenForge uses it \\
+  \endhead\hline
+  GitHub OAuth     & \texttt{[FR-GH-02]} All user authentication. GitHub username is the platform identity. No separate account creation required. \\
+  \rowcolor{ofrowalt}
+  GitHub Issues    & \texttt{[FR-GH-03]} Every platform request must link to a GitHub issue. Issue tracking, comments, and labels remain on GitHub; the platform does not replicate them. \\
+  GitHub Actions   & \texttt{[FR-GH-04]} All CI checks (build, lint, tests, secrets scan). The platform reads check statuses via the GitHub API; it does not run any CI infrastructure. \\
+  \rowcolor{ofrowalt}
+  GitHub Webhooks  & \texttt{[FR-GH-05]} PR state changes (opened, updated, merged, closed) trigger platform state updates. Webhook payloads are verified via HMAC-SHA256 signature. \\
+  CODEOWNERS       & \texttt{[FR-GH-06]} Maintainer assignment for new repositories is enforced via a CODEOWNERS file generated or updated by the platform on maintainer nomination acceptance. \\
+  \rowcolor{ofrowalt}
+  GitHub Releases  & \texttt{[FR-GH-07]} Release events from linked repositories are surfaced on the platform request page as version milestones. \\
+  GitHub Notifications & \texttt{[FR-GH-08]} Upstream maintainer notifications for tagged requests are delivered via GitHub's native mention mechanism (@username in an issue comment), not a platform-side email. \\
+  \rowcolor{ofrowalt}
+  Package registries & \texttt{[FR-GH-09]} Install and download signals are read from PyPI, npm, crates.io, and AUR APIs where a tool is distributed there. \\
+  \hline
+\end{longtable}
+
+\subsection{Platform-Owned Surface}
+The following are the only capabilities the platform builds and owns:
+\begin{itemize}
+  \item Request submission form and metadata storage (title, description, category, tags, links)
+  \item Upvote and prioritisation ranking
+  \item Review annotation threads (Agree, Extend, Flag)
+  \item Contributor and reviewer profile aggregation and domain footprint calculation
+  \item Maintainer nomination workflow (submit, notify, accept)
+  \item Stale detection and Maintainer claim workflow (Tool requests only)
+  \item Solved mark from Requester
+  \item Moderation queue
+\end{itemize}
+
+\subsection{Degraded Mode}
+\texttt{[FR-GH-10]} If GitHub APIs are unavailable: browsing, voting, and review annotations continue normally; PR linking and state sync are queued and retried; authentication falls back to an active session token; last known GitHub check statuses are displayed with a staleness indicator.
+
+%% 8. LICENSING
+\section{Licensing}
+
+\subsection{Default License}
+\texttt{[FR-LI-01]} All tools contributed through the platform adopt the following default license unless the contributor selects an alternative at PR submission time:
+
+\begin{infobox}
+Free to use, modify, and distribute for any purpose, including commercial use, provided that attribution is given to the original contributor and a link to the original platform request is included in the distributed work or its documentation. No warranty is provided.
+\end{infobox}
+
+\subsection{Alternative License Selection}
+\texttt{[FR-LI-02]} Contributors may select any OSI-approved open source license at the time of PR submission. This includes both permissive licenses (MIT, Apache-2.0, BSD) and copyleft licenses (GPL-3.0, AGPL-3.0, LGPL-3.0), as well as non-commercial variants where those are OSI-listed. The selected license is displayed on the platform request page and must be present in the linked GitHub repository as a LICENSE file.
+
+\texttt{[FR-LI-03]} The platform does not impose a commercial-use requirement on contributors. License selection is the contributor's sole decision, made transparently and visibly to anyone viewing the request.
+
+\texttt{[FR-LI-04]} Non-OSI-approved licenses (proprietary licenses, custom restrictive terms) are not permitted. The platform provides a curated license picker limited to OSI-approved options.
+
+%% 9. FUTURE EXTENSIONS
+\section{Future Extension Considerations}
+The following are out of scope for v1.0 but considered in the architecture:
+
+\subsection{Funding and Bounty Model}
+A monetary funding layer --- where requesters or third parties pool funds to incentivise work --- is architecturally anticipated but explicitly deferred. The data model for requests shall include a nullable fund field to avoid rework at activation. No payment infrastructure is built in v1.0.
+
+\subsection{University and Course Integration}
+Structured export API for university course management systems; instructors may assign platform requests as course deliverables with completion verified by PR merge.
+
+\subsection{Verified Skill Credentials}
+Domain footprint data packaged as W3C Verifiable Credentials for sharing with employers.
+
+\subsection{AI Tool Integration}
+AI coding tool providers surface relevant open requests to their users via the platform's public request API during coding sessions.
+
+\subsection{Expanded Ecosystem Coverage}
+Ecosystem-specific verticals beyond Linux tooling: Kubernetes ecosystem, neovim/vim plugin ecosystem, language-specific developer tools.
+
+\subsection{Mentorship Pairing}
+Opt-in mentorship pairing of new coders with experienced contributors, based on tag overlap and explicit availability flags.
+
+%% APPENDICES
+\appendix
+
+\section{Initial Tag Taxonomy --- Linux Tooling}
+\begin{longtable}{L{3.2cm} L{6.5cm} L{3.6cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Tag & \color{white}\bfseries Description & \color{white}\bfseries Related tags \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Tag & \color{white}\bfseries Description & \color{white}\bfseries Related tags \\
+  \endhead\hline
+  \texttt{linux-desktop}    & Tools and interfaces for Linux desktop environments & gtk, qt, wayland, x11 \\
+  \rowcolor{ofrowalt}
+  \texttt{linux-storage}    & File system tools, partition managers, backup utilities & btrfs, ext4, zfs, rsync \\
+  \texttt{linux-networking} & Network configuration, monitoring, and diagnostic tools & nmcli, iptables, wireguard \\
+  \rowcolor{ofrowalt}
+  \texttt{linux-system}     & System monitoring, process management, service control & systemd, htop, cgroups \\
+  \texttt{linux-security}   & Permissions, audit tools, encryption interfaces & gpg, selinux, apparmor \\
+  \rowcolor{ofrowalt}
+  \texttt{linux-package}    & Package management frontends and tooling & apt, pacman, flatpak, snap \\
+  \texttt{shell}            & Shell scripting, terminal emulators, shell utilities & bash, zsh, fish, tmux \\
+  \rowcolor{ofrowalt}
+  \texttt{python}           & Python-language tooling and library interfaces & --- \\
+  \texttt{rust}             & Rust-language tooling & --- \\
+  \rowcolor{ofrowalt}
+  \texttt{c-cpp}            & C and C++ tooling & --- \\
+  \texttt{documentation}    & Documentation tools, man page generators, wikis & --- \\
+  \rowcolor{ofrowalt}
+  \texttt{accessibility}    & Assistive technology, high-contrast, screen reader support & --- \\
+  \texttt{ui-ux}            & General interface design and usability improvements & --- \\
+  \hline
+\end{longtable}
+
+\section{Review Annotation Types}
+\begin{longtable}{L{3.2cm} L{10.1cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Annotation & \color{white}\bfseries Description \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Annotation & \color{white}\bfseries Description \\
+  \endhead\hline
+  \textbf{Agree}             & Endorses an existing review comment without adding new content. Any user may agree. \\
+  \rowcolor{ofrowalt}
+  \textbf{Extend}            & Adds new supporting detail or a relevant reference. Creates a child entry in the thread. Strongly encouraged for new coders as a first reviewing action. \\
+  \textbf{Flag as incorrect} & Challenges factual accuracy or applicability. Requires a written explanation. Notifies the original commenter. \\
+  \hline
+\end{longtable}
+
+\section{Maintainer Nomination Decision Tree}
+
+\begin{longtable}{L{3.5cm} L{3.5cm} L{6.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Request type & \color{white}\bfseries Repository & \color{white}\bfseries Maintainer resolution \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Request type & \color{white}\bfseries Repository & \color{white}\bfseries Maintainer resolution \\
+  \endhead\hline
+  Tool           & New (created for this request) & Requester self-nominates, suggests a user, or leaves open for Contributor volunteer. Required before request progresses past Claimed. \\
+  \rowcolor{ofrowalt}
+  Feature        & Existing & Upstream GitHub maintainer. Platform optionally notifies if tagged by Requester. \\
+  Bug Fix        & Existing & Upstream GitHub maintainer. Platform optionally notifies if tagged by Requester. \\
+  \rowcolor{ofrowalt}
+  UI/UX Improvement & Existing & Upstream GitHub maintainer. Platform optionally notifies if tagged by Requester. \\
+  Documentation  & Existing & Upstream GitHub maintainer. Platform optionally notifies if tagged by Requester. \\
+  \hline
+\end{longtable}
+
+\section{Revision History}
+\begin{longtable}{L{1.5cm} L{8.5cm} L{3.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Version & \color{white}\bfseries Changes & \color{white}\bfseries Author \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Version & \color{white}\bfseries Changes & \color{white}\bfseries Author \\
+  \endhead\hline
+  1.0 & Initial release. & Platform founding team \\
+  \rowcolor{ofrowalt}
+  1.1 & Maintainer nomination model added (Section 3) covering new and existing repository cases. Stale tracking scoped exclusively to Tool-type requests with new repositories. Funding model removed from functional scope; deferred to future extension. Licensing section added: contributor-selected OSI-approved license, commercial and non-commercial options both permitted, platform default is permissive with attribution. GitHub integration section restructured to enumerate GitHub-native features used directly vs.\ platform-owned surface. FR-MN, FR-LI requirement identifiers added. & Platform founding team \\
+  \hline
+\end{longtable}
+
+\vfill
+\begin{center}
+\color{ofrule}\rule{0.5\textwidth}{0.4pt}\\[0.5em]
+{\small\color{ofgray}\itshape OpenForge FR-1.1 --- Contributor-selected OSI-approved license}
+\end{center}
+
+\end{document}

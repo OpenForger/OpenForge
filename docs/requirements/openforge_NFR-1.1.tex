@@ -1,0 +1,394 @@
+\documentclass[12pt,a4paper]{article}
+\newcommand{\doctype}{--- Non-Functional Requirements}
+\newcommand{\docdate}{March 2026}
+\usepackage{openforge_style}
+\begin{document}
+
+%% COVER PAGE
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{3cm}
+  {\fontsize{42}{50}\selectfont\bfseries\color{ofblue} OPENFORGE}\\[0.6em]
+  {\Large\color{ofaccent} Software Requirements Specification}\\[0.3em]
+  {\large\color{ofaccent} Non-Functional Requirements --- NFR-1.1}\\[1.5em]
+  \color{ofrule}\rule{0.6\textwidth}{1.2pt}\\[1.5em]
+  {\normalsize\itshape\color{ofgray}
+    A Community-Driven Open Source Contribution Platform\\[0.3em]
+    Quality Attributes, Constraints, and System Properties
+  }\\[3cm]
+  \begin{tabular}{L{3.5cm} L{8cm}}
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Document ID}   & NFR-1.1 \\
+    \textbf{\color{ofblue}Version}       & 1.1 --- Revised \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Status}        & Draft \\
+    \textbf{\color{ofblue}Date}          & March 2026 \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Audience}      & Platform Architects, Engineers, DevOps, Security \\
+    \textbf{\color{ofblue}Companion doc} & FR-1.1 (Functional Requirements) \\
+    \rowcolor{ofmidbg}
+    \textbf{\color{ofblue}Standard}      & ISO/IEC 25010 Quality Model \\
+  \end{tabular}
+\end{center}
+\newpage
+
+\tableofcontents
+\newpage
+
+%% 1. INTRODUCTION
+\section{Introduction}
+
+\subsection{Purpose}
+This document specifies the non-functional requirements (NFRs) for OpenForge. Where the Functional Requirements document (FR-1.1) defines \emph{what} the system does, this document defines \emph{how well} it does it --- the quality attributes, constraints, and system-wide properties governing the platform's architecture and implementation.
+
+A key architectural principle running through all NFRs is that OpenForge shall remain \textbf{lightweight}: it maximises use of GitHub's existing infrastructure and avoids building anything the platform does not uniquely need to own. This principle directly shapes performance, maintainability, and portability requirements throughout this document.
+
+NFRs are organised following the ISO/IEC 25010 quality model.
+
+\subsection{Requirement Identifier Convention}
+Each requirement is assigned a unique identifier of the form \texttt{[NFR-XX-NN]}, where \texttt{XX} denotes the quality category and \texttt{NN} is a sequential number.
+
+\subsection{Priority Classification}
+\begin{longtable}{L{2.5cm} L{10.8cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Priority & \color{white}\bfseries Meaning \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Priority & \color{white}\bfseries Meaning \\
+  \endhead\hline
+  \textbf{Must}   & Non-negotiable for v1.0 launch. Failure to meet constitutes a release blocker. \\
+  \rowcolor{ofrowalt}
+  \textbf{Should} & Strongly desired for v1.0. May be deferred with documented justification. \\
+  \textbf{Could}  & Desirable quality attribute. Targeted for a subsequent release if not achieved in v1.0. \\
+  \hline
+\end{longtable}
+
+%% 2. PERFORMANCE EFFICIENCY
+\section{Performance Efficiency}
+
+\subsection{Response Time}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PE-01} & Must   & Request listing and discovery pages shall load within \textbf{2 seconds} at the 95th percentile on a standard broadband connection. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-02} & Must   & Individual request pages including vote counts and review thread summary shall load within \textbf{2 seconds} at the 95th percentile. \\
+  \texttt{NFR-PE-03} & Must   & User profile pages shall load within \textbf{3 seconds} at the 95th percentile. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-04} & Must   & Search and tag-based filtering shall return results within \textbf{1.5 seconds} at the 95th percentile. \\
+  \texttt{NFR-PE-05} & Should & Review thread pages shall support incremental loading; initial render shall appear within \textbf{1 second} with remaining comments loading progressively. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-06} & Must   & GitHub webhook events shall be processed and applied to platform state within \textbf{30 seconds} of the event timestamp under normal load. \\
+  \hline
+\end{longtable}
+
+\subsection{Throughput and Scalability}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PE-07} & Must   & The platform shall support at least \textbf{1,000 concurrent users} at v1.0 launch without degradation of response time targets. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-08} & Should & The architecture shall support horizontal scaling to \textbf{10,000 concurrent users} without fundamental redesign. \\
+  \texttt{NFR-PE-09} & Must   & The webhook ingestion pipeline shall process at least \textbf{500 GitHub events per minute} without backlog accumulation under sustained load. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-10} & Should & Package registry polling for install signals shall run in isolated background workers and shall not impact user-facing response times. \\
+  \hline
+\end{longtable}
+
+\subsection{Resource Efficiency}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PE-11} & Should & Database query plans for request discovery, tag filtering, and profile retrieval shall be validated with EXPLAIN ANALYZE before release; no sequential full-table scans on tables exceeding 10,000 rows. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PE-12} & Could  & Static assets shall be served via a CDN with cache TTLs of at least 7 days for versioned assets. \\
+  \texttt{NFR-PE-13} & Should & GitHub API calls shall be batched and cached where the response is not time-critical (e.g.\ fork counts, release lists) to stay within GitHub's rate limits without requiring elevated API access. \\
+  \hline
+\end{longtable}
+
+%% 3. RELIABILITY
+\section{Reliability}
+
+\subsection{Availability}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-RE-01} & Must   & The platform shall target \textbf{99.5\% uptime} (monthly), equating to no more than approximately 3.6 hours of unplanned downtime per month. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-RE-02} & Must   & Planned maintenance windows shall be announced at least \textbf{48 hours} in advance and shall not exceed \textbf{2 hours} per occurrence. \\
+  \texttt{NFR-RE-03} & Should & The platform shall implement a \texttt{/health} endpoint returning system status within 200ms, consumable by monitoring infrastructure. \\
+  \hline
+\end{longtable}
+
+\subsection{Fault Tolerance and Degraded Mode}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-RE-04} & Must   & If GitHub APIs are unavailable, the platform shall continue to serve request browsing, voting, and review annotation without error. GitHub-dependent features (PR linking, state sync, Actions status) shall queue for retry. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-RE-05} & Must   & If a package registry API is unavailable, the platform shall serve the last cached install count with a staleness timestamp, not an error or zero. \\
+  \texttt{NFR-RE-06} & Should & Webhook delivery failures shall be retried with exponential backoff for up to \textbf{24 hours} before moving to a dead-letter queue for manual inspection. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-RE-07} & Must   & No single component failure shall result in data loss for user-submitted content (requests, review comments, profile data, maintainer nominations). \\
+  \hline
+\end{longtable}
+
+\subsection{Recoverability}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-RE-08} & Must   & The platform database shall be backed up with a \textbf{Recovery Point Objective (RPO)} of no more than \textbf{1 hour}. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-RE-09} & Must   & The \textbf{Recovery Time Objective (RTO)} for a full platform restore shall not exceed \textbf{4 hours}. \\
+  \texttt{NFR-RE-10} & Should & Backups shall be tested by a full restore to a staging environment at least \textbf{once per quarter}. \\
+  \hline
+\end{longtable}
+
+%% 4. USABILITY
+\section{Usability}
+
+\subsection{Accessibility}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-US-01} & Must   & All platform pages shall conform to \textbf{WCAG 2.1 Level AA} standards. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-US-02} & Must   & Review threads, request pages, and profile pages shall be fully navigable by \textbf{keyboard alone} with visible focus indicators. \\
+  \texttt{NFR-US-03} & Must   & All interactive elements shall be accessible via \textbf{screen readers} (tested against NVDA and VoiceOver). \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-US-04} & Must   & Profile pages shall be \textbf{fully readable without JavaScript} (progressive enhancement). Core data must be present in server-rendered HTML. \\
+  \texttt{NFR-US-05} & Should & The platform shall pass automated accessibility audits (e.g.\ axe-core) on every release with zero critical violations. \\
+  \hline
+\end{longtable}
+
+\subsection{Learnability and New Coder Experience}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-US-06} & Must   & A new user completing their first review or first PR claim shall be able to do so without consulting external documentation. All required steps shall be surfaced in-product with contextual guidance. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-US-07} & Must   & The \emph{good first review} and \emph{good first contribution} filters shall be displayed on the primary discovery page without requiring navigation to a filter panel. \\
+  \texttt{NFR-US-08} & Must   & The maintainer nomination flow shall guide a non-technical Requester through creating a GitHub repository and CODEOWNERS file via step-by-step in-product instructions, without assuming prior GitHub administration experience. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-US-09} & Should & Platform error messages shall be written in plain language and shall suggest a corrective action where possible. \\
+  \hline
+\end{longtable}
+
+\begin{infobox}
+NFR-US-08 reflects the reality that Requesters may be non-technical users who have a genuine need but lack GitHub administration experience. The maintainer nomination flow must not assume any prior knowledge of CODEOWNERS syntax or repository settings.
+\end{infobox}
+
+\subsection{Internationalisation}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-US-10} & Should & The platform UI shall be internationalisation-ready: all user-facing strings shall be externalised into resource files, supporting future translation without code changes. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-US-11} & Could  & A community-contributed translation for at least one additional language shall be available within 6 months of public launch. \\
+  \hline
+\end{longtable}
+
+%% 5. SECURITY
+\section{Security}
+
+\subsection{Authentication and Authorisation}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-SE-01} & Must   & All user authentication shall be performed via \textbf{GitHub OAuth 2.0}. The platform shall not store user passwords. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-02} & Must   & Session tokens shall expire after \textbf{30 days} of inactivity. Users shall be re-authenticated via GitHub OAuth on expiry. \\
+  \texttt{NFR-SE-03} & Must   & All API endpoints that write data shall require a valid authenticated session. Read-only public endpoints may be unauthenticated. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-04} & Must   & GitHub webhook payloads shall be verified using the \textbf{HMAC-SHA256 signature} in the \texttt{X-Hub-Signature-256} header. Payloads failing verification shall be rejected and logged. \\
+  \texttt{NFR-SE-05} & Must   & The CODEOWNERS file generation step (maintainer nomination) shall only be performed using a GitHub token with the minimum required repository scope. The token shall not be stored in platform logs. \\
+  \hline
+\end{longtable}
+
+\subsection{Data Protection}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-SE-06} & Must   & All data in transit shall be encrypted using \textbf{TLS 1.2 or higher}. TLS 1.0 and 1.1 shall be disabled. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-07} & Must   & User email addresses obtained via GitHub OAuth shall never be stored in plain text in application logs or displayed publicly. \\
+  \texttt{NFR-SE-08} & Should & The platform shall implement \textbf{Content Security Policy (CSP)} headers to mitigate XSS attacks. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-09} & Must   & All user-submitted content (request descriptions, review comments) shall be sanitised to prevent stored XSS before rendering. \\
+  \hline
+\end{longtable}
+
+\subsection{Rate Limiting and Abuse Prevention}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-SE-10} & Must   & Upvote and annotation actions shall be rate-limited per authenticated user. Default limit: 60 voting actions per hour per account. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-11} & Must   & A single account shall not cast more than \textbf{one upvote per request}. Duplicate attempts shall be rejected silently. \\
+  \texttt{NFR-SE-12} & Should & Automated bot detection shall be applied to account creation and high-frequency voting patterns, with flagged accounts entering a manual review queue. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-SE-13} & Must   & All moderation actions shall be logged with timestamp, actor ID, and action type in an append-only audit log inaccessible to non-moderators. \\
+  \hline
+\end{longtable}
+
+%% 6. MAINTAINABILITY
+\section{Maintainability}
+
+\subsection{Extensibility}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-MA-01} & Must   & The tag taxonomy shall be versioned. New tags may be added; existing tags may be deprecated with a migration path but shall never be deleted while referenced by existing profiles or requests. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-02} & Must   & The request category taxonomy shall be extensible without schema migration of existing request records. \\
+  \texttt{NFR-MA-03} & Must   & The quality stage pipeline shall be modular. New stages may be added or made optional without affecting records from earlier stages. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-04} & Must   & The profile data model shall be additive. New profile data points may be introduced without removing or migrating existing ones. \\
+  \texttt{NFR-MA-05} & Must   & The GitHub integration layer shall be implemented behind an abstraction interface such that a future VCS provider (GitLab, Codeberg) can be added by implementing the same interface without modifying core platform logic. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-06} & Must   & The funding model data fields (nullable fund amount on requests) shall be present in the database schema from v1.0 to avoid a schema migration when the funding feature is activated in a future release. \\
+  \hline
+\end{longtable}
+
+\subsection{Code Quality and Testability}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-MA-07} & Must   & All API endpoints shall have integration test coverage. Minimum: \textbf{80\%} line coverage across the backend codebase at launch. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-08} & Must   & The GitHub webhook pipeline shall have a test harness capable of replaying recorded webhook payloads without a live GitHub connection. \\
+  \texttt{NFR-MA-09} & Must   & The maintainer nomination flow --- including CODEOWNERS file generation and the GitHub notification via mention --- shall have an integration test suite that operates against a GitHub test organisation, not a mock. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-10} & Should & All database schema changes shall be applied via a versioned migration tool. Rolling back a migration shall not result in data loss. \\
+  \texttt{NFR-MA-11} & Should & The codebase shall pass a static analysis linter with zero errors on every CI run. \\
+  \hline
+\end{longtable}
+
+\subsection{Observability}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-MA-12} & Must   & Application logs shall be structured (JSON), timestamped, and include a request trace ID enabling correlation across services. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-13} & Must   & Key platform metrics shall be emitted as time-series data: request creation rate, PR link rate, review comment rate, webhook processing latency, maintainer nomination acceptance rate, and API error rate by endpoint. \\
+  \texttt{NFR-MA-14} & Should & An alerting rule shall fire when webhook processing latency exceeds \textbf{60 seconds} for more than 5 consecutive minutes. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-MA-15} & Should & The platform shall expose a \texttt{/metrics} endpoint in Prometheus exposition format. \\
+  \hline
+\end{longtable}
+
+%% 7. PRIVACY AND LEGAL
+\section{Privacy and Legal Compliance}
+
+\subsection{User Privacy}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PL-01} & Must   & User email addresses shall never be displayed publicly. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-02} & Must   & A user may request account deletion. Deletion shall anonymise the account (replacing the username with ``deleted user'') but shall preserve contribution and review records in aggregate to maintain historical integrity. \\
+  \texttt{NFR-PL-03} & Must   & The platform shall publish a Privacy Policy before accepting user registrations, documenting data collected, how it is used, and how users may request deletion. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-04} & Should & The platform shall comply with \textbf{GDPR} requirements for users in the EEA: right to access, right to erasure, and data portability. \\
+  \hline
+\end{longtable}
+
+\subsection{Licensing}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PL-05} & Must   & The platform default license shall be: free to use, modify, and distribute for any purpose including commercial use, provided attribution is given to the original contributor and a link to the platform request is included. No warranty provided. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-06} & Must   & Contributors may select any \textbf{OSI-approved} open source license as an alternative. Both permissive (MIT, Apache-2.0) and copyleft (GPL-3.0, AGPL-3.0) options shall be available. Commercial and non-commercial OSI-approved variants are both permitted. \\
+  \texttt{NFR-PL-07} & Must   & Non-OSI-approved licenses shall not be selectable. The license picker shall be limited to a curated list of OSI-approved options. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-08} & Must   & The selected license shall be displayed on the platform request page and shall be present as a LICENSE file in the linked GitHub repository before the request progresses past the In Development state. \\
+  \hline
+\end{longtable}
+
+\subsection{Moderation and Trust}
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PL-09} & Must   & A threshold of 5 distinct user flags on any request shall automatically trigger a moderation queue entry. The threshold shall be configurable without a code deployment. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-10} & Must   & All moderation decisions shall be logged with timestamp, moderator ID, and action taken in an append-only audit log. \\
+  \texttt{NFR-PL-11} & Must   & Users shall be able to appeal any moderation decision within \textbf{30 days} via a structured appeal form. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PL-12} & Should & Moderators shall not moderate content on requests or PRs in which they are named as contributor, reviewer, or requester. \\
+  \hline
+\end{longtable}
+
+%% 8. PORTABILITY
+\section{Portability and Deployment}
+
+\begin{longtable}{L{2.2cm} L{1.8cm} L{9.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries ID & \color{white}\bfseries Priority & \color{white}\bfseries Requirement \\
+  \endhead\hline
+  \texttt{NFR-PO-01} & Must   & The platform shall be deployable as a set of \textbf{OCI-compliant containers} (Docker), enabling deployment on any compliant container runtime. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PO-02} & Must   & The platform shall not embed hard dependencies on any specific cloud provider's proprietary services. Infrastructure primitives shall be accessed via standard or provider-agnostic interfaces. \\
+  \texttt{NFR-PO-03} & Must   & The platform web application shall function correctly on the \textbf{two most recent stable versions} of Chrome, Firefox, Safari, and Edge at the time of release. \\
+  \rowcolor{ofrowalt}
+  \texttt{NFR-PO-04} & Should & The platform shall be deployable in a \textbf{self-hosted} configuration using open source infrastructure components (PostgreSQL, Redis, nginx) for organisations that prefer not to use the hosted service. \\
+  \hline
+\end{longtable}
+
+%% REVISION HISTORY
+\section*{Revision History}
+\addcontentsline{toc}{section}{Revision History}
+
+\begin{longtable}{L{1.5cm} L{8.5cm} L{3.3cm}}
+  \rowcolor{ofaccent}\color{white}\bfseries Version & \color{white}\bfseries Changes & \color{white}\bfseries Author \\
+  \endfirsthead
+  \rowcolor{ofaccent}\color{white}\bfseries Version & \color{white}\bfseries Changes & \color{white}\bfseries Author \\
+  \endhead\hline
+  1.0 & Initial release. & Platform founding team \\
+  \rowcolor{ofrowalt}
+  1.1 & NFR-US-08 added for maintainer nomination UX (non-technical requester guidance). NFR-PE-13 added for GitHub API rate limit management. NFR-SE-05 added for CODEOWNERS token scope. NFR-MA-06 added for deferred funding schema fields. NFR-MA-09 added for maintainer nomination integration testing. Licensing section updated: both commercial and non-commercial OSI-approved licenses now explicitly permitted (NFR-PL-06). Funding-related privacy NFRs removed (feature deferred). & Platform founding team \\
+  \hline
+\end{longtable}
+
+\vfill
+\begin{center}
+\color{ofrule}\rule{0.5\textwidth}{0.4pt}\\[0.5em]
+{\small\color{ofgray}\itshape OpenForge NFR-1.1 --- Contributor-selected OSI-approved license}
+\end{center}
+
+\end{document}

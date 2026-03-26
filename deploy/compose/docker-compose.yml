@@ -1,0 +1,41 @@
+# OpenForge — local / small-VM staging stack (Postgres + Redis).
+# See: docs/deployment/staging-stack.md
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: openforge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openforge_dev_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-openforge}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - openforge_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: openforge-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - openforge_redis:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  openforge_pgdata:
+  openforge_redis:
