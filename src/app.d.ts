@@ -3,8 +3,20 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
+		interface Locals {
+			user: {
+				githubId: string;
+				login: string;
+				avatarUrl: string | null;
+			} | null;
+		}
+		interface PageData {
+			user: {
+				githubId: string;
+				login: string;
+				avatarUrl: string | null;
+			} | null;
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}

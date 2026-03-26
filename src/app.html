@@ -3,6 +3,16 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				const q = window.matchMedia('(prefers-color-scheme: dark)');
+				function sync() {
+					document.documentElement.classList.toggle('dark', q.matches);
+				}
+				q.addEventListener('change', sync);
+				sync();
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
